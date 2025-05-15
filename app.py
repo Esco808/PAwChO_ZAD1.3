@@ -20,9 +20,10 @@ app = Flask(__name__)
 
 # Predefiniowana lista krajów i miast
 locations = {
-    "Polska": ["Warszawa", "Kraków", "Gdańsk"],
-    "Niemcy": ["Berlin", "Monachium", "Hamburg"],
-    "Francja": ["Paryż", "Lyon", "Marsylia"]
+    "Polska": ["Warszawa", "Kraków", "Gdańsk", "Lublin"],
+    "Niemcy": ["Berlin", "Monachium", "Hamburg", "Stuttgart"],
+    "Francja": ["Paryż", "Lyon", "Marsylia", "Nicea"],
+    "Hiszpania": ["Madryt", "Barcelona", "Sewilla", "Walencja"]
 }
 
 @app.route("/", methods=["GET", "POST"])
@@ -58,7 +59,7 @@ def index():
             else:
                 weather = {"error": "Nie udało się pobrać pogody"}
         else:
-            # Jeśli nie wybrano miasta, wyczyść dane pogodowe
+            # Jeśli nie wybrano kraju i miasta, wyczyść dane pogodowe
             weather = None
 
     return render_template("index.html",
