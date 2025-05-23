@@ -1,38 +1,31 @@
 # Link do DockerHub:
-https://hub.docker.com/r/ostrowski2000/zad1
+https://hub.docker.com/r/ostrowski2000/weather_app2
 lub
 ```bash
-docker pull ostrowski2000/zad1
+docker pull ostrowski2000/weather_app2
 ```
 
-# Wynik działania kontenera:
-![Wynik działania kontenera](./img/app.png)
+# Wynik analizy Docker Scout:
+![Wynik analizy](./img/scout.png)
 
-# Wynik polecenia HEALTHCHECK:
-![Wynik polecenia HEALTHCHECK](./img/healthcheck.png)
+# Manifest:
+![Manifest](./img/inspect.png)
 
-# Polecenia niezbędne do:
-**a. zbudowania opracowanego obrazu kontenera**
+# Dowód wykorzystania cache:
+![Cache](./img/cache.png)
+
+# Polecenia niezbędne do zbudowania obrazu i uruchomienia kontenera:
 ```bash
-docker build -t weather_app .
+docker buildx build \
+--platform linux/amd64,linux/arm64 \
+--push --tag ostrowski2000/weather_app2:latest \
+--ssh default \
+--build-arg BUILDKIT_INLINE_CACHE=1 \
+--cache-from=type=registry,ref=ostrowski2000/weather_app2:cache \
+--cache-to=type=registry,ref=ostrowski2000/weather_app2:cache,mode=max \
+.
+
+docker pull ostrowski2000/weather_app2:latest
+
+docker run -e OPENWEATHER_API_KEY=$OPENWEATHER_API_KEY -p 8000:8000 ostrowski2000/weather_app2:latest
 ```
-**b. uruchomienia kontenera na podstawie zbudowanego obrazu**
-```bash
-docker run -d -e OPENWEATHER_API_KEY=$OPENWEATHER_API_KEY -p 8000:8000 --name weather_app weather_app
-```
-**c. uzyskania informacji z logów, które wygenerowała opracowana aplikacja podczas uruchamiana kontenera**
-```bash
-docker logs weather_app
-```
-![Wynik polecenia docker logs](./img/logs.png)
-**d. sprawdzenia ile warstw posiada zbudowany obraz**
-```bash
-docker history weather_app:latest
-docker history --no-trunc --format '{{.CreatedBy}}' weather_app:latest | wc -l
-```
-![Wynik polecenia docker history](./img/image.png)
-**oraz jaki jest rozmiar obrazu**
-```bash
-docker images weather_app
-```
-![Wynik polecenia docker images](./img/size.png)

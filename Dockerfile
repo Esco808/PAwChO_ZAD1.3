@@ -1,25 +1,26 @@
-FROM python:3.11-slim
+# syntax=docker/dockerfile:1.6
 
-# metadane zgodne ze standardem OCI
+FROM python:3.13-slim
+
 LABEL org.opencontainers.image.authors="Paweł Ostrowski <s99649@pollub.edu.pl>"
 
-# ustawienie katalogu roboczego
 WORKDIR /app
 
-# kopiowanie plików aplikacji do kontenera
-COPY . .
+# Instalacja git i curl
+RUN apt-get update && apt-get install -y git curl openssh-client && apt-get clean
 
-# instalacja curl
-RUN apt-get update && apt-get install -y curl && apt-get clean
+# Dodanie github.com do zaufanych hostów ssh
+RUN mkdir -p /root/.ssh && ssh-keyscan github.com >> /root/.ssh/known_hosts
 
-# instalacja zależności
+# Pobranie kodu bezpośrednio z repozytorium GitHub
+RUN --mount=type=ssh git clone git@github.com:Esco808/PAwChO_ZAD1.git /app
+
+# Instalacja zależności
 RUN pip install --no-cache-dir -r requirements.txt
 
-# nasłuchiwanie na porcie 8000
 EXPOSE 8000
 
-# healthcheck
 HEALTHCHECK --interval=10s --timeout=1s --retries=3 CMD curl -f http://localhost:8000/ || exit 1
 
-# uruchomienie aplikacji
 CMD ["python", "app.py"]
+
